@@ -1,0 +1,66 @@
+local player = game.Players.LocalPlayer
+local dataPoints = player:WaitForChild("Stats"):WaitForChild("DataPoints")
+
+local windowFrame = script.Parent
+local scrollingFrame = windowFrame:WaitForChild("ScrollingFrame")
+
+-- collect frames under windowFrame
+local entryFrames = {}
+for _, child in ipairs(windowFrame:GetChildren()) do
+	if child:IsA("Frame") then
+		entryFrames[child.Name] = child
+	end
+end
+
+local function hideAllFrames()
+	for _, frameObj in pairs(entryFrames) do
+		frameObj.Visible = false
+	end
+end
+
+local function showFrame(frameName)
+	hideAllFrames()
+	local frameObj = entryFrames[frameName]
+	if frameObj then
+		frameObj.Visible = true
+	end
+end
+
+local function setupButton(button)
+	local targetFrameName = button:GetAttribute("Frame")
+	local unlockCost = button:GetAttribute("UnlockCost")
+	if not targetFrameName or not unlockCost then return end
+
+	local frame = entryFrames[targetFrameName]
+	if not frame then return end
+
+	local lockedLabel = frame:WaitForChild("LockedLabel")
+	local unlockedLabel = frame:WaitForChild("UnlockedLabel")
+
+	button.MouseButton1Click:Connect(function()
+		showFrame(targetFrameName) -- hide every other frame, show this one
+
+		if dataPoints.Value < unlockCost then
+			lockedLabel.Visible = true
+			unlockedLabel.Visible = false
+			lockedLabel.Text = "ENTRY LOCKED - " .. unlockCost .. " DATA POINTS REQUIRED"
+			return
+		end
+
+		lockedLabel.Visible = false
+		unlockedLabel.Visible = true
+	end)
+
+	button.MouseEnter:Connect(function()
+		button.TextColor3 = Color3.fromRGB(0, 190, 0)
+	end)
+	button.MouseLeave:Connect(function()
+		button.TextColor3 = Color3.fromRGB(0, 170, 0)
+	end)
+end
+
+for _, button in ipairs(scrollingFrame:GetChildren()) do
+	if button:IsA("TextButton") then
+		setupButton(button)
+	end
+end
