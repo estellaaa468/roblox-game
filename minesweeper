@@ -1,0 +1,65 @@
+--NOT YET IMPLEMENTED
+local minesweeperField = {
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+}
+
+
+local mines = 40
+
+
+
+function createPart(position,even)
+	local cell = Instance.new("Part")
+	local cellGui = Instance.new("SurfaceGui")
+	local cellLabel = Instance.new("TextLabel")
+
+	cell.Size = Vector3.new(5, 1, 5)
+	cell.Anchored = true
+	cell.Parent = workspace
+	cell.Position = position
+	cell.Color = Color3.fromHex("#848484")
+	cell.Material = Enum.Material.DiamondPlate
+
+	cellGui.Parent = cell
+	cellGui.Face = Enum.NormalId.Top
+	cellGui.PixelsPerStud = 10
+	cellGui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+
+	cellLabel.Text = "0"
+	cellLabel.Size = UDim2.new(1, 0, 1, 0)
+	cellLabel.BackgroundTransparency = 1
+	cellLabel.Parent = cellGui
+	cellLabel.TextSize = 90
+	cellLabel.TextScaled = true
+	if even then
+		cell.Color = Color3.fromRGB(220,220,220)
+	else 
+		cell.Color = Color3.fromRGB(128,128,128)
+	end
+	
+end
+
+local spacing = 5
+local startPosition = Vector3.new(-200.882, 1.5, 111.981)
+for i = 0, 15 do
+	for j = 0, 15 do
+		local position = startPosition + Vector3.new(i * spacing, 0, j * spacing)
+		createPart(position, (i+j) % 2 == 0)
+	end
+end
+
