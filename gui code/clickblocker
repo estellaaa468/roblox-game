@@ -1,0 +1,9 @@
+--lowkey dunno if this works
+local button = script.Parent
+local windowFrame = button.Parent
+
+button.MouseButton1Click:Connect(function()
+	windowFrame.Visible = not windowFrame.Visible
+	terminalFrame.ClickBlocker.Visible = false
+	print("Database visible:", windowFrame.Visible)
+end)
