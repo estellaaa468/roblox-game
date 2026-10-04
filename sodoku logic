@@ -1,0 +1,332 @@
+local sodokuTable = {
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0}
+}
+
+local spacing = 5.5
+local difficulty = "easy"
+local solutionCount = 0
+
+local toRemoveEasy = math.random(31, 41)
+local toRemoveMedium = math.random(42,51)
+local toRemoveHard = math.random(52,56)
+local toRemoveExpert = math.random(57,59)
+local puzzleCompleted = false
+
+
+
+function difficultySet () --someone call yandev
+	if difficulty == "easy" then
+		toRemove = toRemoveEasy
+	elseif difficulty == "medium" then
+		toRemove = toRemoveMedium
+	elseif difficulty == "hard" then
+		toRemove = toRemoveHard
+	elseif difficulty == "expert" then
+		toRemove = toRemoveExpert
+	end
+end
+
+
+function checkWin(player, difficulty)
+	if puzzleCompleted then
+		return true
+	end
+	for i = 1, 9 do
+		for j = 1, 9 do
+			if sodokuTable[i][j] == 0 then
+				print("Cell empty at", i, j)
+				return false
+			elseif not(checkRow(i, j, sodokuTable[i][j]) and checkCol(i, j, sodokuTable[i][j]) and checkBox(i, j, sodokuTable[i][j])) then
+				print("Conflict at", i, j, "value", sodokuTable[i][j])
+				return false
+			end
+		end
+	end
+	
+	if puzzleCompleted == false then 
+		puzzleCompleted = true
+		local stats = player:FindFirstChild("Stats")
+		local dataPoints = stats:FindFirstChild("DataPoints")
+		if difficulty == "easy" then
+			dataPoints.Value += 10
+		elseif difficulty == "medium" then
+			dataPoints.Value += 25
+		elseif difficulty == "hard" then
+			dataPoints.Value += 50
+		elseif difficulty == "expert" then
+			dataPoints.Value += 100
+		end
+		print(dataPoints.Value)
+		return true
+	end
+	
+end
+
+
+function checkRow (row, col, num)
+	for i = 1, 9 do
+		if sodokuTable[row][i] == num and i ~= col then
+			return false
+		end
+	end
+	return true
+end
+
+function checkCol (row, col, num)
+	for i = 1, 9 do
+		if sodokuTable[i][col] == num and i ~= row then
+			return false
+		end
+	end
+	return true
+end
+
+function checkBox (row, col, num)
+	local boxRow = math.ceil(row / 3)
+	local bloxCol = math.ceil(col / 3)
+	for i = 3 * (boxRow - 1) + 1, 3 * boxRow do
+		for j = 3 * (bloxCol - 1) + 1, 3 * bloxCol do
+			if sodokuTable[i][j] == num and not(i == row and j == col) then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+
+
+
+
+function findNextEmpty ()
+	for i = 1, 9 do
+		for j = 1, 9 do
+			if sodokuTable[i][j] == 0 then
+				return i, j
+			end
+		end
+	end
+	return nil, nil
+end
+
+
+
+
+function createCoordList()
+	local coordList = {}
+	for i = 1, 9 do
+		for j = 1, 9 do
+			table.insert(coordList, {row = i, col = j})
+		end
+	end
+	return coordList
+end
+
+local positions = createCoordList()
+
+function solve()
+	local row, col = findNextEmpty()
+	if row == nil then
+		return true
+	end
+	for i = 1, 9 do
+		if checkRow(row, col, i) and checkCol(row, col, i) and checkBox(row, col, i) then
+			sodokuTable[row][col] = i
+			if solve() then
+				return true
+			end
+			sodokuTable[row][col] = 0
+		end
+	end
+	return false
+
+end
+
+function shufflePositions()
+	for i = 81, 2, -1 do
+		local randomIndex = math.random(1,i)
+		local temp = positions[i]
+		positions[i] = positions[randomIndex]
+		positions[randomIndex] = temp
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+function removeNums(toRemove)
+	local counter = 0
+	for _, pos in pairs(positions) do
+		if counter >= toRemove then
+			break
+		end
+		local saved = sodokuTable[pos.row][pos.col]
+		sodokuTable[pos.row][pos.col] = 0
+		solutionCount = 0
+		countSolutions()
+		if solutionCount ~= 1 then
+			sodokuTable[pos.row][pos.col] = saved
+		else
+			counter = counter + 1
+		end
+	end
+end
+
+
+
+
+function createDividers()
+	local boundaries = {3.5, 6.5}
+
+	for _, b in pairs(boundaries) do
+		-- vertical line at this boundary
+		local vLine = Instance.new("Part")
+		vLine.Size = Vector3.new(0.5, 2.2, 9 * spacing)
+		vLine.Position = Vector3.new(b * spacing, 0.25, 5 * spacing)
+		vLine.Anchored = true
+		vLine.Color = Color3.fromRGB(0, 232, 253)
+		vLine.Parent = workspace
+		vLine.Material = Enum.Material.Neon
+
+		-- horizontal line at this boundary
+		local hLine = Instance.new("Part")
+		hLine.Size = Vector3.new(9 * spacing, 2.2, 0.5)
+		hLine.Position = Vector3.new(5 * spacing, 0.25, b * spacing)
+		hLine.Anchored = true
+		hLine.Color = Color3.fromRGB(0, 232, 253)
+		hLine.Parent = workspace
+		hLine.Material = Enum.Material.Neon
+	end
+end
+
+
+
+function createPart (position, cellNum, i, j)
+	local cell = Instance.new("Part")
+	local cellGui = Instance.new("SurfaceGui")
+	local cellLabel = Instance.new("TextLabel")
+	cell.Size = Vector3.new(5,2,5)
+	cell.Anchored = true
+	cell.Parent = workspace
+	cell.Position = position
+	cell.Color = Color3.fromHex("#848484")
+	cell.Material = Enum.Material.Salt
+	cell.Orientation = Vector3.new(0, math.random(-5, 5), 0)
+
+
+
+
+
+	cellGui.Parent = cell
+	cellGui.Face = Enum.NormalId.Top
+	cellGui.PixelsPerStud = 10
+	cellGui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+
+	if cellNum == 0 then
+		cellLabel.Text = ""
+	else
+		cellLabel.Text = tostring(cellNum)
+	end
+	cellLabel.Size = UDim2.new(1, 0, 1, 0)
+	cellLabel.BackgroundTransparency = 1
+	cellLabel.Parent = cellGui
+	cellLabel.TextSize = 90
+	cellLabel.TextScaled = true
+	cellLabel.Rotation = 180
+
+	local isValid = true
+
+
+
+	if cellNum == 0 then
+		local detectClick = Instance.new("ClickDetector")
+		detectClick.Parent = cell
+
+		detectClick.MouseClick:Connect(function(player)
+			local toNum = sodokuTable[i][j] or 0
+			if toNum >= 9 then
+				toNum = 0
+			else
+				toNum += 1
+			end
+
+			sodokuTable[i][j] = toNum
+
+			if toNum == 0 then
+				cellLabel.Text = ""
+			else
+				cellLabel.Text = tostring(toNum)
+			end
+
+			if toNum ~= 0 then
+				isValid =
+					checkRow(i, j, toNum)
+					and checkCol(i, j, toNum)
+					and checkBox(i, j, toNum)
+
+				if not isValid then
+					print("Invalid")
+				end
+			end
+
+			print(sodokuTable[i][j])
+			checkWin(player,difficulty)
+		end)
+	end
+
+
+end
+
+
+
+function countSolutions()
+	if solutionCount >= 2 then
+		return false
+	end
+	local row, col = findNextEmpty()
+	if row == nil then
+		solutionCount = solutionCount + 1
+		return false 
+	end
+	for i = 1, 9 do
+		if checkRow(row, col, i) and checkCol(row, col, i) and checkBox(row, col, i) then
+			sodokuTable[row][col] = i
+			countSolutions()
+			sodokuTable[row][col] = 0
+		end
+	end
+	return false
+
+end
+
+
+solve()
+shufflePositions()
+difficultySet()
+removeNums(toRemove)
+createDividers()
+
+
+for i = 1, 9 do
+	for j = 1, 9 do
+		local position = Vector3.new(i * spacing, 0.5, j * spacing)
+		createPart(position, sodokuTable[i][j], i, j)
+	end
+end
