@@ -1,0 +1,92 @@
+local button = script.Parent
+local terminalFrame = button.Parent
+local windowFrame = terminalFrame:WaitForChild("settingsFrame")
+
+button.MouseEnter:Connect(function()
+	if windowFrame.Visible then
+		return
+	end
+
+	button.Text = ">> SETTINGS_"
+	button.TextColor3 = Color3.fromRGB(0, 185, 0)
+end)
+
+button.MouseLeave:Connect(function()
+	if windowFrame.Visible then
+		return
+	end
+
+	button.Text = "> SETTINGS"
+	button.TextColor3 = Color3.fromRGB(0, 170, 0)
+end)
+
+button.MouseButton1Click:Connect(function()
+	button.Text = "> SETTINGS"
+	if windowFrame.Visible then
+		return
+	end
+
+	windowFrame.Visible = true
+	terminalFrame.ClickBlocker.Visible = true
+	print("Window visible:", windowFrame.Visible)
+end)
+
+
+
+local button = script.Parent
+local terminalFrame = button.Parent
+local windowFrame = terminalFrame:WaitForChild("aboutFrame")
+
+button.MouseEnter:Connect(function()
+	button.Text = ">> ABOUT_"
+	button.TextColor3 = Color3.fromRGB(0, 185, 0)
+end)
+
+button.MouseLeave:Connect(function()
+	button.Text = "> ABOUT"
+	button.TextColor3 = Color3.fromRGB(0, 170, 0)
+end)
+button.MouseButton1Click:Connect(function()
+	button.Text = "> ABOUT"
+	if windowFrame.Visible then
+		return
+	end
+
+	windowFrame.Visible = true
+	terminalFrame.ClickBlocker.Visible = true
+	print("Window visible:", windowFrame.Visible)
+end)
+
+
+local button = script.Parent
+local terminalFrame = button.Parent
+local windowFrame = terminalFrame:WaitForChild("databaseFrame")
+
+button.MouseEnter:Connect(function()
+	if windowFrame.Visible then
+		return
+	end
+
+	button.Text = ">> ACCESS DATABASE_"
+	button.TextColor3 = Color3.fromRGB(0, 185, 0)
+end)
+
+button.MouseLeave:Connect(function()
+	if windowFrame.Visible then
+		return
+	end
+
+	button.Text = "> ACCESS DATABASE"
+	button.TextColor3 = Color3.fromRGB(0, 170, 0)
+end)
+
+button.MouseButton1Click:Connect(function()
+	button.Text = "> ACCESS DATABASE"
+	if windowFrame.Visible then
+		return
+	end
+
+	windowFrame.Visible = true
+	terminalFrame.ClickBlocker.Visible = true
+	print("Window visible:", windowFrame.Visible)
+end)
