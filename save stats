@@ -1,0 +1,59 @@
+local Players = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local playerDataStore = DataStoreService:GetDataStore("PlayerDataStore")
+Players.PlayerAdded:Connect(function(player)
+	local stats = Instance.new("Folder")
+	stats.Name = "Stats"
+	stats.Parent = player
+	---------------------- diffrent types of currencies here
+	local points = Instance.new("IntValue")
+	points.Name = "Points" 
+	points.Value = 0
+	points.Parent = stats
+	
+	local ResearchPoints = Instance.new("IntValue") --minesweeper
+	ResearchPoints.Name = "ResearchPoints" 
+	ResearchPoints.Value = 0
+	ResearchPoints.Parent = stats
+	
+	local environmentKnowledge = Instance.new("IntValue") --star battles
+	environmentKnowledge.Name = "InfoPoints" 
+	environmentKnowledge.Value = 0
+	environmentKnowledge.Parent = stats
+	
+	local dataPoints = Instance.new("IntValue") --sodoku?
+	dataPoints.Name = "DataPoints" 
+	dataPoints.Value = 200
+	dataPoints.Parent = stats
+	
+	--data save------
+	local success, data = pcall(function()
+		return playerDataStore:GetAsync(player.UserId)
+	end)
+	if success and data then
+		points.Value = data.Points or 0
+		ResearchPoints.Value = data.ResearchPoints or 0
+		environmentKnowledge.Value = data.InfoPoints or 0
+		dataPoints.Value = data.DataPoints or 0
+	end
+	
+	
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	local stats = player:FindFirstChild("Stats")
+
+	local data = {
+		Points = stats.Points.Value,
+		ResearchPoints = stats.ResearchPoints.Value,
+		InfoPoints = stats.InfoPoints.Value,
+		DataPoints = stats.DataPoints.Value,
+
+	}
+	local success, errorMessage = pcall(function()
+		playerDataStore:SetAsync(player.UserId, data)
+	end)
+	if not success then
+		warn("Failed to save data for player " .. player.Name .. ": " .. errorMessage)
+	end
+end)
